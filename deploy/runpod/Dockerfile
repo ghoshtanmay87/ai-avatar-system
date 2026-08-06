@@ -36,8 +36,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # ── Backend: Python deps ────────────────────────────────────────────────────
+# chatterbox-tts>=0.1.4 (all published versions) hard-pins torch==2.6.0 /
+# torchaudio==2.6.0, which conflicts with this repo's torch==2.2.0 pin (and,
+# transitively, with MuseTalk's own diffusers==0.32.2 requirement — newer
+# chatterbox-tts also wants diffusers==0.29.0, an unresolvable double
+# conflict). Rather than upgrade the whole ML stack and risk breaking
+# MuseTalk, we drop chatterbox-tts here: the backend's TTS service already
+# has a built-in fallback chain (see app/services/tts.py) that catches
+# exactly this "chatterbox unavailable" case and uses Edge TTS's free
+# neural voices instead. You lose voice *cloning*; everything else —
+# including the avatar actually speaking — keeps working.
 COPY backend/requirements.txt /app/backend/requirements.txt
-RUN pip install --no-cache-dir -r /app/backend/requirements.txt \
+RUN grep -v '^chatterbox-tts' /app/backend/requirements.txt > /tmp/requirements.filtered.txt \
+    && pip install --no-cache-dir -r /tmp/requirements.filtered.txt \
     && pip install --no-cache-dir \
          torch==2.2.0+cu118 torchvision==0.17.0+cu118 torchaudio==2.2.0+cu118 \
          --index-url https://download.pytorch.org/whl/cu118 \
