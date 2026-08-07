@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       redis-server \
       nginx \
       supervisor \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && ln -sf python3.10 /usr/bin/python3 \
     && ln -sf python3 /usr/bin/python \
@@ -55,7 +55,8 @@ RUN grep -v '^chatterbox-tts' /app/backend/requirements.txt > /tmp/requirements.
     # extra deps used by MuseTalk's preprocessing/inference pipeline that
     # aren't already pulled in by backend/requirements.txt
     && pip install --no-cache-dir \
-         einops==0.8.1 omegaconf "moviepy<2" mediapipe safetensors timm gdown huggingface_hub
+         einops==0.8.1 omegaconf "moviepy<2" mediapipe safetensors timm gdown huggingface_hub \
+         numpy==1.26.3
 
 COPY backend/ /app/backend/
 RUN chmod +x /app/backend/entrypoint.sh \
