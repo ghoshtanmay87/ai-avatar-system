@@ -64,7 +64,7 @@ RUN chmod +x /app/backend/entrypoint.sh \
 # ── Frontend: build with relative API/WS paths (nginx proxies same-origin,
 #    so we don't need to know the pod's URL at build time) ─────────────────
 COPY frontend/package.json frontend/package-lock.json* /app/frontend/
-RUN cd /app/frontend && npm ci
+RUN cd /app/frontend && npm install
 COPY frontend/ /app/frontend/
 ENV NEXT_PUBLIC_API_URL="" \
     NEXT_PUBLIC_WS_URL="" \
